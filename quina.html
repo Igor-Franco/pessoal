@@ -384,11 +384,31 @@
       const message = document.querySelector("#message");
       let currentBets = [];
 
+      function randomInt(maxExclusive) {
+        const cryptoApi = window.crypto || window.msCrypto;
+
+        if (!cryptoApi || !cryptoApi.getRandomValues) {
+          throw new Error("Seu navegador nao oferece geracao aleatoria segura.");
+        }
+
+        const range = 0x100000000;
+        const limit = range - (range % maxExclusive);
+        const values = new Uint32Array(1);
+        let value;
+
+        do {
+          cryptoApi.getRandomValues(values);
+          value = values[0];
+        } while (value >= limit);
+
+        return value % maxExclusive;
+      }
+
       function drawBet(size) {
         const pool = Array.from({ length: 80 }, (_, index) => index + 1);
 
         for (let index = pool.length - 1; index > 0; index -= 1) {
-          const randomIndex = Math.floor(Math.random() * (index + 1));
+          const randomIndex = randomInt(index + 1);
           [pool[index], pool[randomIndex]] = [pool[randomIndex], pool[index]];
         }
 
